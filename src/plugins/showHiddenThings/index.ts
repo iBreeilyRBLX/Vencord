@@ -18,7 +18,9 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
+import { Logger } from "@utils/Logger";
 import definePlugin, { OptionType, PluginSettingDef } from "@utils/types";
+import { GuildMember, Role } from "@vencord/discord-types";
 
 const opt = (description: string) => ({
     type: OptionType.BOOLEAN,
@@ -73,8 +75,8 @@ export default definePlugin({
             find: "#{intl::GUILD_MEMBER_MOD_VIEW_PERMISSION_GRANTED_BY_ARIA_LABEL}),allowOverflow:",
             predicate: () => settings.store.showModView,
             replacement: {
-                match: /(role:)\i(?=,guildId.{0,100}role:(\i\[))/,
-                replace: "$1$2arguments[0].member.highestRoleId]",
+                match: /(?<=\.highestRole\),)role:\i(?<=\[\i\.roles,\i\.highestRoleId,(\i)\].+)/,
+                replace: "role:$self.getHighestRole(arguments[0],$1)",
             }
         },
         // allows you to open mod view on yourself
@@ -85,48 +87,15 @@ export default definePlugin({
                 match: /\i(?=\?null)/,
                 replace: "false"
             }
-        },
-        {
-            find: ".GUILD_SETTINGS_MEMBERS_PAGE),",
-            predicate: () => settings.store.showMembersPageInSettings,
-            replacement: {
-                match: /\i\.hasFeature\(\i\.\i\.ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY\)/,
-                replace: "false"
-            }
-        },
-        // disable redirect to sidebar
-        {
-            find: "GuildSettingsMembersRow",
-            predicate: () => settings.store.showMembersPageInSettings,
-            replacement: {
-                match: /\i\.isCommunity\(\)/,
-                replace: "false"
-            }
-        },
-        {
-            find: /ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY.{0,700}GUILD_MOD_DASH_MEMBER_SAFETY/,
-            predicate: () => settings.store.showMembersPageInSidebar,
-            replacement: {
-                match: /\i\.hasFeature\(\i\.\i\.ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY\)/,
-                replace: "true"
-            }
-        },
-        // discord, why does this check have to exist?
-        {
-            find: 'type:"INITIALIZE_MEMBER_SAFETY_STORE"',
-            predicate: () => settings.store.showMembersPageInSidebar,
-            replacement: {
-                match: /\i\.hasFeature\(\i\.\i\.ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY\)/,
-                replace: "true"
-            },
-        },
-        {
-            find: "DefaultCustomizationSections",
-            predicate: () => settings.store.bannerColorPicker,
-            replacement: {
-                match: /:(\(0,\i\.jsx\)\(\i\.\i,.{0,20}savedUserColor:)/,
-                replace: ":null,$1"
-            }
-        },
-    ]
+        }
+    ],
+
+    getHighestRole({ member }: { member: GuildMember; }, roles: Role[]): Role | undefined {
+        try {
+            return roles.find(role => role.id === member.highestRoleId);
+        } catch (e) {
+            new Logger("ShowHiddenThings").error("Failed to find highest role", e);
+            return undefined;
+        }
+    }
 });

@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+// DO NOT REMOVE UNLESS YOU WISH TO FACE THE WRATH OF THE CIRCULAR DEPENDENCY DEMON!!!!!!!
+import "~plugins";
+
 export * as Api from "./api";
 export * as Components from "./components";
 export * as Plugins from "./plugins";
@@ -29,8 +32,8 @@ export { PlainSettings, Settings };
 import "./utils/quickCss";
 import "./webpack/patchWebpack";
 
-import { createStyle } from "@api/Styles";
-import { openUpdaterModal } from "@components/VencordSettings/UpdaterTab";
+import { openUpdaterModal } from "@components/settings/tabs/updater";
+import { IS_WINDOWS } from "@utils/constants";
 import { StartAt } from "@utils/types";
 
 import { get as dsGet } from "./api/DataStore";
@@ -162,7 +165,10 @@ init();
 document.addEventListener("DOMContentLoaded", () => {
     startAllPlugins(StartAt.DOMContentLoaded);
 
-    if (IS_DISCORD_DESKTOP && Settings.winNativeTitleBar && navigator.platform.toLowerCase().startsWith("win")) {
-        createStyle("vencord-native-titlebar-style", "[class*=titleBar]{display: none!important}");
+    if (IS_DISCORD_DESKTOP && Settings.winNativeTitleBar && IS_WINDOWS) {
+        document.head.append(Object.assign(document.createElement("style"), {
+            id: "vencord-native-titlebar-style",
+            textContent: "[class*=titleBar]{display: none!important}"
+        }));
     }
 }, { once: true });

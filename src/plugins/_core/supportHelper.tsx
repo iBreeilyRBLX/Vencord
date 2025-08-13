@@ -21,9 +21,8 @@ import { getUserSettingLazy } from "@api/UserSettings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { Link } from "@components/Link";
-import { openUpdaterModal } from "@components/VencordSettings/UpdaterTab";
-import { gitRemote } from "@shared/vencordUserAgent";
-import { CONTRIB_ROLE_ID, Devs, DONOR_ROLE_ID, KNOWN_ISSUES_CHANNEL_ID, REGULAR_ROLE_ID, SUPPORT_CATEGORY_ID, SUPPORT_CHANNEL_ID, VENBOT_USER_ID } from "@utils/constants";
+import { openUpdaterModal } from "@components/settings/tabs/updater";
+import { CONTRIB_ROLE_ID, Devs, DONOR_ROLE_ID, KNOWN_ISSUES_CHANNEL_ID, REGULAR_ROLE_ID, SUPPORT_CATEGORY_ID, SUPPORT_CHANNEL_ID, VENBOT_USER_ID, VENCORD_GUILD_ID } from "@utils/constants";
 import { sendMessage } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { Margins } from "@utils/margins";
@@ -33,8 +32,8 @@ import { onlyOnce } from "@utils/onlyOnce";
 import { makeCodeblock } from "@utils/text";
 import definePlugin, { OptionType } from "@utils/types";
 import { checkForUpdates, isOutdated, update } from "@utils/updater";
-import { Alerts, Button, Card, ChannelStore, Forms, NavigationRouter, Parser, PermissionsBits, PermissionStore, RelationshipStore, showToast, Text, Toasts, UserStore } from "@webpack/common";
-import { Channel } from "discord-types/general";
+import { Channel } from "@vencord/discord-types";
+import { Alerts, Button, Card, ChannelStore, Forms, GuildMemberStore, Parser, PermissionsBits, PermissionStore, RelationshipStore, showToast, Text, Toasts, UserStore } from "@webpack/common";
 import { JSX } from "react";
 
 import gitHash from "~git-hash";
@@ -89,7 +88,7 @@ async function generateDebugInfoMessage() {
             `v${VERSION} • [${gitHash}](<https://github.com/${gitRemote}/commit/${gitHash}>)` +
             `${SettingsPlugin.additionalInfo} - ${Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(BUILD_TIMESTAMP)}`,
         Client: `${RELEASE_CHANNEL} ~ ${client}`,
-        Platform: window.navigator.platform
+        Platform: navigator.platform
     };
 
     if (IS_DISCORD_DESKTOP) {
@@ -207,9 +206,8 @@ export default definePlugin({
                 }
             }
 
-            // @ts-ignore outdated type
-            // const roles = GuildMemberStore.getSelfMember(VENCORD_GUILD_ID)?.roles;
-            // if (!roles || TrustedRolesIds.some(id => roles.includes(id))) return;
+            const roles = GuildMemberStore.getSelfMember(VENCORD_GUILD_ID)?.roles;
+            if (!roles || TrustedRolesIds.some(id => roles.includes(id))) return;
 
             // if (!IS_WEB && IS_UPDATER_DISABLED) {
             //     return Alerts.show({
@@ -337,7 +335,7 @@ export default definePlugin({
         if (RelationshipStore.isFriend(userId) || isPluginDev(UserStore.getCurrentUser()?.id)) return null;
 
         return (
-            <Card className={`vc-plugins-restart-card ${Margins.top8}`}>
+            <Card className={`vc-warning-card ${Margins.top8}`}>
                 {userId !== SQAAAKOI_USER_ID ? <>
                     Please do not private message other Vencord plugin developers for support.
                     <br />
@@ -352,7 +350,7 @@ export default definePlugin({
                         allowEmojiLinks: true,
                     })
                 }
-            </Card >
+            </Card>
         );
     }, { noop: true }),
 });
