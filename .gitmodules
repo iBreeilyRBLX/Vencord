@@ -185,3 +185,9 @@
 [submodule "src/thirdpartyplugins/signature"]
 	path = src/thirdpartyplugins/signature
 	url = https://github.com/KrstlSkll69/Signature
+[submodule "src/thirdpartyplugins/betterForums"]
+	path = src/thirdpartyplugins/betterForums
+	url = https://github.com/Davr1/vc-betterForums
+[submodule "src/thirdpartyplugins/vc-message-logger-enhanced"]
+	path = src/thirdpartyplugins/vc-message-logger-enhanced
+	url = https://github.com/Syncxv/vc-message-logger-enhanced.git
