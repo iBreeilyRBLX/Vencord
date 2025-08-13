@@ -10,7 +10,8 @@ import { Devs } from "@utils/constants";
 import { useForceUpdater } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
 import { findStoreLazy } from "@webpack";
-import { ChannelStore, ContextMenuApi, Menu, MessageStore, PresenceStore, PrivateChannelsStore, RelationshipStore, UserStore, useStateFromStores } from "@webpack/common";
+import { ChannelStore, ContextMenuApi, Menu, MessageStore, PresenceStore, RelationshipStore, UserStore, useStateFromStores } from "@webpack/common";
+import { openPrivateChannel } from "@utils/discord";
 import { Channel, Message, User } from "discord-types/general";
 import { MouseEvent } from "react";
 
@@ -75,7 +76,7 @@ const contextMenuPatch: NavContextMenuPatchCallback = (children, props) => {
                 key="toggle-pinned-to-sidebar"
                 checked={enabled}
                 action={async () => {
-                    const channelId = cachedChannelId || (user ? await PrivateChannelsStore.getOrEnsurePrivateChannel(user?.id) : null);
+                    const channelId = cachedChannelId || (user ? ChannelStore.getDMFromUserId(user?.id) : null);
                     if (!channelId) return;
                     const old = channelIDList.split(",").map(id => id.trim()).filter(id => id.length > 0);
                     settings.store.channelIDList = (enabled ? old.filter(id => id !== channelId) : [...old, channelId]).join(",");
