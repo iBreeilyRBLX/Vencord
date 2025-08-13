@@ -8,7 +8,7 @@ import "./index.css";
 
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
-import definePlugin, { OptionType, makeRange } from "@utils/types";
+import definePlugin, { makeRange, OptionType } from "@utils/types";
 
 export const settings = definePluginSettings({
     frequentEmojis: {

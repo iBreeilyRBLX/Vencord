@@ -9,7 +9,7 @@ import { definePluginSettings } from "@api/Settings";
 import { clearableDebounce, debounce } from "@shared/debounce";
 import { Devs } from "@utils/constants";
 import { humanFriendlyJoin } from "@utils/text";
-import definePlugin, { OptionType, makeRange } from "@utils/types";
+import definePlugin, { makeRange, OptionType } from "@utils/types";
 import { findByPropsLazy, findStoreLazy } from "@webpack";
 import { ChannelStore, GuildMemberStore, Menu, RelationshipStore, SelectedChannelStore, Toasts, UserStore } from "@webpack/common";
 import { User } from "discord-types/general";

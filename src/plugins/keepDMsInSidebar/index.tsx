@@ -11,7 +11,6 @@ import { useForceUpdater } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
 import { findStoreLazy } from "@webpack";
 import { ChannelStore, ContextMenuApi, Menu, MessageStore, PresenceStore, RelationshipStore, UserStore, useStateFromStores } from "@webpack/common";
-import { openPrivateChannel } from "@utils/discord";
 import { Channel, Message, User } from "discord-types/general";
 import { MouseEvent } from "react";
 
